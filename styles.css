@@ -234,7 +234,7 @@ transition: all 0.8s cubic-bezier(1, 0, 0, 1);
 
 }
 .it:hover {
-transform:translateX(205px);
+transform:translateX(250px);
 background: black;
 }
 
