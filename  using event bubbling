@@ -1,0 +1,126 @@
+// ****** SELECT ITEMS **********
+const alert = document.querySelector(".alert");
+const form = document.querySelector(".grocery-form");
+const grocery = document.getElementById("grocery");
+const submitBtn = document.querySelector(".submit-btn");
+const groceryContainer = document.querySelector(".grocery-container");
+const list = document.querySelector(".grocery-list");
+const clearBtn = document.querySelector(".clear-btn");
+
+// Edit option variables
+let editElement;
+let editFlag = false;
+let editId = ``;
+
+// EVENT LISTENERS
+// Event listener for submitting the form
+form.addEventListener("submit", addItem);
+// Event listener for clearing all items
+clearBtn.addEventListener("click", deleteAllItems);
+// Event listener for edit and delete buttons using event delegation
+list.addEventListener("click", handleButtonClick);
+
+//  *******FUNCTIONS*******
+
+// Function to add a new item
+function addItem(evt) {
+  evt.preventDefault();
+  const value = grocery.value;
+  const id = new Date().getTime().toString();
+
+  if (value && !editFlag) {
+    // Creating a new grocery item element
+    const element = document.createElement("article");
+    element.classList.add("grocery-item");
+    const attribute = document.createAttribute("data-id");
+    attribute.value = id;
+    element.setAttributeNode(attribute);
+    element.innerHTML = `<p class="title">${value}</p>
+    <div class="btn-container">
+      <button type="button" class="edit-btn">
+        <i class="fa-solid fa-pen-to-square edit-btn"></i>
+      </button>
+      <button type="button" class="delete-btn">
+        <i class="fa-solid fa-trash delete-btn"></i>
+      </button>
+    </div>`;
+    // Appending the new item to the list
+    list.appendChild(element);
+    // Displaying alert and showing grocery container
+    displayAlert(`${value} added to list`, "success");
+    groceryContainer.classList.add("show-container");
+    // Adding to local storage
+    addToLocalStorage(id, value);
+    // Setting back to default state
+    setBackToDefault();
+  } else if (value && editFlag) {
+    // updating edited item
+    editElement.innerHTML = grocery.value;
+    displayAlert(`changed to ${value}`, "success");
+    setBackToDefault();
+  } else {
+    // Displaying an alert for an empty value
+    displayAlert("please enter a value", "danger");
+  }
+}
+
+// Function to handle button clicks using event delegation
+function handleButtonClick(evt) {
+  const targetBtn = evt.target;
+
+  // Handling edit button click
+  if (targetBtn.classList.contains("edit-btn")) {
+    const element = targetBtn.parentElement.parentElement.parentElement;
+    const id = element.dataset.id;
+    editElement = targetBtn.parentElement.parentElement.previousElementSibling;
+    const text = element.innerHTML;
+    grocery.value = editElement.innerHTML;
+    editFlag = true;
+    editId = id;
+    submitBtn.textContent = "edit";
+  }
+  // Handling delete button click
+  else if (targetBtn.classList.contains("delete-btn")) {
+    const element = targetBtn.closest(".grocery-item");
+    list.removeChild(element);
+    const item = targetBtn.parentElement.parentElement.previousElementSibling;
+    const text = item.textContent;
+    displayAlert(`${text} deleted`, "danger");
+    setBackToDefault();
+  }
+}
+
+// Function to display alerts
+function displayAlert(text, action) {
+  alert.textContent = text;
+  alert.classList.add(`alert-${action}`);
+
+  // Removing alert after a delay
+  setTimeout(function () {
+    alert.textContent = "";
+    alert.classList.remove(`alert-${action}`);
+  }, 1300);
+}
+
+// Function to delete all items
+function deleteAllItems(evt) {
+  const allItems = document.querySelectorAll(".grocery-item");
+  allItems.forEach(function (item) {
+    list.removeChild(item);
+  });
+  groceryContainer.classList.remove("show-container");
+  displayAlert("deleted all items", "danger");
+}
+
+// Function to set back to default state
+function setBackToDefault() {
+  editFlag = false;
+  editId = "";
+  grocery.value = "";
+  submitBtn.textContent = "Submit";
+}
+
+// Function to add to local storage (placeholder, actual implementation needed)
+function addToLocalStorage(id, value) {
+  console.log("added to local storage");
+}

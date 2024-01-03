@@ -1,0 +1,257 @@
+// <!-- content of the grocery list -->
+<p class="title">item</p>
+<!-- edit and delete button -->
+<div class="btn-container">
+  <button type="button" class="edit-btn">
+    <i class="fa-solid fa-pen-to-square"></i>
+  </button>
+  <!-- delete btn -->
+  <button type="button" class="delete-btn">
+    <i class="fa-solid fa-trash"></i>
+  </button>
+</div>
+
+
+
+
+// SETUP FOR DETAILED EXPLANATIONS. 
+
+=============================================
+<!-- js -->
+============================================
+
+// ****** SELECT ITEMS **********
+const alert = document.querySelector(".alert");
+const form = document.querySelector(".grocery-form");
+const grocery = document.getElementById("grocery");
+const submitBtn = document.querySelector(".submit-btn");
+const groceryContainer = document.querySelector(".grocery-container");
+const list = document.querySelector(".grocery-list");
+const clearBtn = document.querySelector(".clear-btn");
+const id = new Date().getTime().toString();
+
+// edit option
+let editElement;
+// we are not going to edit from the get go, so the edit flag will be set to false. we are only going to edit when the edit button is toggled.
+let editFlag = false;
+
+// we are going to use the editId to get a specific item in our list
+let editId = ``;
+
+// ======================================================
+// ****** EVENT LISTENERS **********
+// 1 submit form
+form.addEventListener("submit", addItem);
+clearBtn.addEventListener("click", clearItems);
+
+// ****** FUNCTIONS **********
+// =====================================================
+function addItem(e) {
+  e.preventDefault();
+  const value = grocery.value;
+
+  //   if the value is not an emty string and the edit flag is false,(meaning we are not editing anything at the moment, we are going to console log adding item to list.
+  // normally value is equals to our grocery.value is a true condtion and editFlag is equals to false is our true condition. so down below we say if value(is true), and !editFlag(edit flag is not false, the following conditions should take place.)
+  if (value !== "" && !editFlag) {
+    //creating dynamic element
+    const element = document.createElement("article");
+    // adding class to the element
+    element.classList.add("grocery-item");
+    const attribute = document.createAttribute("data-id");
+    attribute.value = id;
+    element.setAttributeNode(attribute);
+    element.innerHTML = `<p class="title">${value}</p>
+    <!-- edit and delete button -->
+    <div class="btn-container">
+      <button type="button" class="edit-btn">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+      <!-- delete btn -->
+      <button type="button" class="delete-btn">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+    `;
+    // =============================================
+
+    // next we have to append the full element with it's class, special attribute and innerHtml to the grocery list
+    list.appendChild(element);
+    // selecting our buttons
+    //  we use element in place of documentc because we are selecting buttons from within our dynamically created element.
+    const editBtn = element.querySelector(".edit-btn");
+    const deleteBtn = element.querySelector(".delete-btn");
+    editBtn.addEventListener("click", editItem);
+    deleteBtn.addEventListener("click", deleteItem);
+
+    groceryContainer.classList.add("show-container");
+    displayAlert("item successfully added", "success");
+
+    // add to local storage
+    addToLocalStorage(id, value);
+    //  set back to default
+    setBackToDefault();
+  }
+  // ============ELSE IF CONDITION=============
+  // if the value is not an empty string and editFlag is true(meaning that we are editing stuff. editing stuff entails that we have toggled the edit button), we want to console log editing.
+  else if (value && editFlag) {
+    const text = grocery.value
+  //  editElement.textContent = value
+   displayAlert(`changed to ${text}`, 'success')
+   setBackToDefault()
+  }
+  // ========ELSE CONDITION======================
+  // if value is an empty string and editFlag is false or true, we want to console log empty string.
+  else {
+    displayAlert("please enter value", "danger");
+  }
+}
+// ================================================
+// ***************** FUNCTIONS ****************
+// ==================================================
+
+// delete function
+function deleteItem(evt) {
+  // 1 first of all we select the parent container of the item clicked
+  const element = evt.currentTarget.parentElement.parentElement;
+  // here we want to get the text content of the grocery.value input i.e if eggs was entered by the user, we want to return egss as a text.
+  // #### selecting the unique id of the clicked item
+  const id = element.dataset.id;
+
+  const itemText = element.querySelector(".title").textContent;
+  // 3 next we remove the grocery item from the parent container which is the list. recall that the item clicked is embedded within the grocery-item
+  list.removeChild(element);
+  const allItems = document.querySelectorAll(".grocery-item");
+
+  // so here we are saying that if the length of the nodelist generated by our grocery items with a variable name of allItems is equals to or less than zero, the grocery container which contains the """clear all items""" button should remove the class of show container, which allows the grocery container to be visible in the first place.
+  if (allItems.length <= 0) {
+    groceryContainer.classList.remove("show-container");
+  }
+  displayAlert(`${editElement} deleted`, "danger");
+}
+// ==========================================================
+// ************* edit function ******************
+function editItem(evt) {
+  // select the clicked grocery item when we click on the edit button
+  const element = evt.currentTarget.parentElement.parentElement;
+  // 2 Get the unique ID of the clicked item: 
+// recall that our element with class of; "grocery-item", has the data-id attribute with a value gotten from our previously created id in the general scope(this id has a value of 'new Date().getTime().string())
+  const id = element.dataset.id;
+  // 4 here we are selecting the button container and then selecting it's previous sibling, which is the paragraph with the title class 
+  editElement = evt.currentTarget.parentElement.previousElementSibling;
+  // 5 here we are saying that when click the edit button, the input assumes a value of the editElement's text content
+  grocery.value = editElement.innerHTML;
+  // 5 Set the editFlag to true:This line sets the editFlag to true, indicating that we are in edit mode.
+  editFlag = true;
+  editId = id;
+  submitBtn.textContent = 'edit'
+}
+// =======================================================================
+// EDIT EXISTING ITEM FUNCTION
+
+// ======================================================
+// display alert function
+function displayAlert(text, action) {
+  alert.textContent = text;
+  alert.classList.add(`alert-${action}`);
+
+  //  set timeout to make our alert only be displayed for a short while.
+  setTimeout(function () {
+    alert.textContent = "";
+    alert.classList.remove(`alert-${action}`);
+  }, 1300);
+
+  // recall that our value is our grocery input item
+}
+// =============================================
+// set back to default function
+function setBackToDefault() {
+  grocery.value = "";
+  editFlag = false;
+  editId = "";
+  submitBtn.textContent = "submit";
+}
+// ===================================================
+// clear items function
+function clearItems(item) {
+  const allItems = document.querySelectorAll(".grocery-item");
+
+  // here we are saying if the length of the nodelist returned by selecting all the grocery items is greater than zero, that means items were added and hence we want to iterate over each and everyone of those items and use the parent container "list" to remove each item
+  // when you console log item, the parameter passed in when iterating over the node list returned from all items, you get all your inputs
+  if (allItems.length > 0) {
+    allItems.forEach(function (item) {
+      list.removeChild(item);
+    });
+  }
+
+  // hide grocery container
+  groceryContainer.classList.remove("show-container");
+  displayAlert("cleared all items", "danger");
+  setBackToDefault();
+}
+
+// ========================================================
+// ****** LOCAL STORAGE **********
+/ ****** LOCAL STORAGE **********
+// adding items to local storage
+function addToLocalStorage(id, value) {
+  // assigning our input value and id
+  const grocery = { id, value };
+
+  // if the local storage has a key with the value of items assign said value to the variable array items else assign it an empty arrray.
+  let items = getLocalStorage();
+
+  // console.log(items);
+  items.push(grocery);
+
+  localStorage.setItem(
+    "list" /*<key */,
+    JSON.stringify(
+      items
+    ) /*< value that the key is assigned to. in this example we are not passing in the values directly but passing it as a variable whose value is an array. */
+  );
+}
+
+// above you will notice that the first time we enter an input we will have an empty array cause from our code above, the array was initially empty till we pushed our grocery object into the items array.
+
+// remove from local storage
+function removeFromLocalStorage(id) {
+  let items = getLocalStorage();
+
+  items = items.filter(function (item) {
+    // if the item in the local storage does not have the same id with the passed when i am deleting the element return that input/element then else delete(that is delete the one that actually matches.
+    // basically, when i click the delete button on an item in our list all the other items in the local storage that do not possess the id that the one i clicked has should be returned and the one i clicked on should be deleted from the local storage
+
+    if (item.id !== id) {
+      return item;
+    }
+  });
+  // we then go further to say that we will assign this new filtered array to our local storage
+  localStorage.setItem("list", JSON.stringify(items));
+}
+// edit local storage
+function editLocalStorage(id, value) {}
+
+// ****** SETUP ITEMS **********
+function getLocalStorage() {
+  return localStorage.getItem("list")
+    ? JSON.parse(localStorage.getItem("list"))
+    : [];
+}
+
+// FURTHER NOTES
+// When the user clicks the "edit" button for a specific item, the editItem function is triggered. It extracts the unique ID of the clicked item and assigns it to the editId variable. This ID is crucial for identifying which item is being edited.
+// In summary, editId is a variable that keeps track of the unique identifier of the item being edited. It helps maintain context and ensures that the correct item is targeted when performing editing operations.
+
+// element.childElementCount returns the number of child elements  of an the "element"
+//  in this scenario, as we dynamically add grocery items to our list, the above method can return how many items we have added. we can further use it as a condition to invoke a code block. For example
+// if(list. childElementCount === 0){groceryContainer.classList.remove('show-container)}
+
+
+
+
+
+
+
+
+
+
