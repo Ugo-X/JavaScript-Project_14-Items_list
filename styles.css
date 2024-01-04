@@ -231,30 +231,7 @@ color: var(--clr-grey-10);
 clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
 display: inline-block;
 transition: all 0.8s cubic-bezier(1, 0, 0, 1);
-
 }
-.it:hover {
-transform:translateX(250px);
-background: black;
-}
-
-.i{
-  display: none;
-  transition: all 0.7s ease-in-out ;
-}
-
-.it:hover + .i {
-display: inline-block;
-clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
-/* background: var(--clr-primary-6); */
-background: black;
-padding: 0 1rem 0 1rem;
-color: var(--clr-white);
-  }
- /* .it:hover + .submit-btn {
-  background: var(--clr-black);
-  color: white;
- } */
 
 #grocery {
   padding: 0.25rem;
