@@ -18,6 +18,8 @@ let editId = "";
 form.addEventListener("submit", addItem);
 // 2. Clear items
 clearBtn.addEventListener("click", clearItems);
+// 3. load items 
+window.addEventListener('DOMContentLoaded', setupItems)
 
 // ****** FUNCTIONS **********
 // =====================================================
@@ -31,32 +33,7 @@ function addItem(e) {
 
   // Check if the value is not an empty string and the edit flag is false
   if (value !== "" && !editFlag) {
-    // Create a dynamic element for the new item
-    const element = document.createElement("article");
-    element.classList.add("grocery-item");
-    const attribute = document.createAttribute("data-id");
-    attribute.value = id;
-    element.setAttributeNode(attribute);
-    element.innerHTML = `<p class="title">${value}</p>
-      <div class="btn-container">
-        <button type="button" class="edit-btn">
-          <i class="fa-solid fa-pen-to-square"></i>
-        </button>
-        <button type="button" class="delete-btn">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>`;
-
-    // Append the new item to the grocery list
-    list.appendChild(element);
-
-    // Select buttons within the new item
-    const editBtn = element.querySelector(".edit-btn");
-    const deleteBtn = element.querySelector(".delete-btn");
-    // Add event listeners to the buttons
-    editBtn.addEventListener("click", editItem);
-    deleteBtn.addEventListener("click", deleteItem);
-
+    createListItem(id,value)
     // Show grocery container and display success alert
     groceryContainer.classList.add("show-container");
     displayAlert("Item successfully added", "success");
@@ -70,11 +47,11 @@ function addItem(e) {
   // Check if editing an existing item
   else if (value && editFlag) {
     const text = grocery.value;
-    editElement.innerHTML = grocery.value; // Update the content of the edited item
+    editElement.innerHTML = value; // Update the content of the edited item
     displayAlert(`Changed to ${text}`, "success");
-    setBackToDefault();
     // Edit local storage
     editLocalStorage(editId, value);
+    setBackToDefault();
   }
   // Handle cases where the value is an empty string
   else {
@@ -152,6 +129,9 @@ function clearItems(item) {
 
   // Set back to default here in case the user is still in edit mode
   setBackToDefault();
+
+  // remove from local storage
+  localStorage.removeItem("list");
 }
 
 // ========================================================
@@ -163,6 +143,7 @@ function addToLocalStorage(id, value) {
 
   // If the local storage has a key with the value of 'list', assign said value to the variable 'items'; otherwise, assign it an empty array.
   let items = getLocalStorage();
+  console.log(items);
 
   // Push the new grocery item to the array
   items.push(groceryItem);
@@ -173,10 +154,8 @@ function addToLocalStorage(id, value) {
 
 // Remove from local storage
 function removeFromLocalStorage(id) {
-  let items = getLocalStorage();
-
   // Filter out the item with the specified id
-  items = items.filter(function (item) {
+  let items = getLocalStorage().filter(function (item) {
     return item.id !== id;
   });
 
@@ -184,14 +163,67 @@ function removeFromLocalStorage(id) {
   localStorage.setItem("list", JSON.stringify(items));
 }
 
-// Edit local storage
+// edit local storage
 function editLocalStorage(id, value) {
-  // Implement edit functionality if needed
+  let items = getLocalStorage();
+  items = items.map(function (item) {
+    if (item.id === id) {
+      item.value = value;
+    }
+    return item;
+  });
+  localStorage.setItem("list", JSON.stringify(items));
 }
 
 // Function to retrieve items from local storage
-function getLocalStorage() {
+const getLocalStorage = () => {
   return localStorage.getItem("list")
     ? JSON.parse(localStorage.getItem("list"))
     : [];
+};
+
+// **** SETUP ITEMS ****
+function setupItems(id, value){
+  // get the items in the local storage
+let items = getLocalStorage()
+// if the the length of the array generated when we get the local storage is greater than 0 then we have items in the array, so we want to iterate over them and create an item with each of them in the grocery container
+if(items.length > 0){
+  items.forEach(function(item){
+createListItem(item.id, item.value)
+  })
+groceryContainer.classList.add('show-container')
+}
+
+}
+
+
+
+function createListItem(id, value){
+  // Create a dynamic element for the new item
+  const element = document.createElement("article");
+  element.classList.add("grocery-item");
+  const attribute = document.createAttribute("data-id");
+  attribute.value = id;
+  element.setAttributeNode(attribute);
+  element.innerHTML = `<p class="title">${value}</p>
+    <div class="btn-container">
+      <button type="button" class="edit-btn">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+      <button type="button" class="delete-btn">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>`;
+
+  // Append the new item to the grocery list
+  list.appendChild(element);
+
+  // Select buttons within the new item
+  const editBtn = element.querySelector(".edit-btn");
+  const deleteBtn = element.querySelector(".delete-btn");
+  // Add event listeners to the buttons
+  editBtn.addEventListener("click", editItem);
+  deleteBtn.addEventListener("click", deleteItem);
+
+
 }

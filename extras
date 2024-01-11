@@ -255,3 +255,28 @@ function getLocalStorage() {
 
 
 
+
+
+
+
+// Edit local storage
+function editLocalStorage(id, value) {
+  // Retrieve the current items from local storage
+  let items = getLocalStorage();
+
+  // Find the index of an item in the 'items' array based on the condition provided
+  // The condition checks if the 'id' property of an item is equal to the given 'id'
+  const index = items.findIndex(function (item) {
+    // Check if the 'id' property of an item is equal to the given 'id'
+    return item.id === id;
+  });
+
+  // Check if the item with the specified 'id' was found in the 'items' array
+  if (index !== -1) {
+    // Update the 'value' property of the found item with the new value
+    items[index].value = value;
+  }
+
+  // Update local storage with the modified 'items' array
+  localStorage.setItem("list", JSON.stringify(items));
+}

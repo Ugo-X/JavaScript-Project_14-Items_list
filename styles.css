@@ -164,7 +164,10 @@ p {
   width: 90vw;
   margin: 0 auto;
   max-width: 35rem;
-  margin-top: 8rem;
+position: absolute;
+left: 50%;
+top: 50%;
+transform: translate(-50%,-50%);
 }
 @media screen and (min-width: 992px) {
   .section-center {
@@ -187,6 +190,7 @@ Grocery List
   box-shadow: var(--light-shadow);
   transition: var(--transition);
   padding: 2rem;
+  max-height: 90vh;
 }
 .section-center:hover {
   box-shadow: var(--dark-shadow);
@@ -231,7 +235,9 @@ color: var(--clr-grey-10);
 clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
 display: inline-block;
 transition: all 0.8s cubic-bezier(1, 0, 0, 1);
+
 }
+
 
 #grocery {
   padding: 0.25rem;
@@ -273,7 +279,11 @@ transition: all 0.8s cubic-bezier(1, 0, 0, 1);
 .grocery-container {
   margin-top: 2rem;
   transition: var(--transition);
-  visibility: hidden;
+  visibility: hidden;=
+}
+.grocery-list{
+  max-height: 40vh;
+  overflow: scroll;
 }
 .show-container {
   visibility: visible;
